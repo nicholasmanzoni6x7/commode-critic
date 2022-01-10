@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel=“stylesheet” href=“css/style.css”>
+    <title>View Commode</title>
+</head>
+<body>
+    <div>
+        <div class ="nav-bar">
+        {%if session['user_id']%}
+    <h1 > {{user.user_name}}</h1>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/logout">Logout</a>
+        {%endif%}
+    <a href="/">Home</a>
+        </div>
+        <div>
+            <h1>{{commode.location}}, Toilet ID: {{commode.id}}</h1>
+            <h2>Created: {{commode.created_at}}</h2> 
+            <h2>Last Updated: {{commode.updated_at}}</h2>
+            <h2>Description:</h2>
+            <p>{{commode.descript}}</p>
+            <h2>Cleanliness Score:</h2>
+            <p>{{commode.clean}}</p>
+            <h2>Comfort Score:</h2>
+            <p>{{commode.comfy}}</p>
+            <h2>Atmosphere Score:</h2>
+            <p>{{commode.atmosphere}}</p>
+            <h2>Safety Rating:</h2>
+            <p>{{commode.atmosphere}}</p>
+            <h3>Number of Toilets:</h3>
+            <p>{{commode.bowls}}</p>
+            <h3>Number of Urinals(if any):</h3>
+            <p>{{commode.urinals}}</p>
+        </div>
+        <div class = "list-control">
+            <ul>
+                {%if commode.access == 0 %}
+                <li>Handicap Accessible</li>
+                {%endif%}
+                {%if commode.gender_neutral == 0 %}
+                <li>Gender Neutral</li>
+                {%endif%}
+                {%if commode.baby == 0 %}
+                <li>Baby Changing Station</li>
+                {%endif%}
+                {%if commode.dispenser == 0 %}
+                <li>Product Dispenser(Condoms/Tampons)</li>
+                {%endif%}
+                {%if commode.fee == 0 %}
+                <li>A Fee Is Required</li>
+                {%endif%}
+                {%if commode.lockd == 0 %}
+                <li>Key Required</li>
+                {%endif%}
+                {%if commode.speak == 0 %}
+                <li>You Must Speak to Someone</li>
+                {%endif%}
+                {%if commode.auto_flush == 0 %}
+                <li>Toilets Auto-Flush</li>
+                {%endif%}
+                {%if commode.auto_sink == 0 %}
+                <li>Hands-Free Sink</li>
+                {%endif%}
+                {%if commode.towel == 0 %}
+                <li>Automatic Towel Dispenser</li>
+                {%endif%}
+                {%if commode.air_dryer == 0 %}
+                <li>Automatic Hand Dryer</li>
+                {%endif%}
+                {%if commode.sanitizer == 0 %}
+                <li>Hand Sanitizer</li>
+                {%endif%}
+            </ul>
+        </div>
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Reviews</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {%if reviews%}
+                    {% for review in reviews %}
+                        <tr>
+                            <td> {{review.content}} <strong> Clean Rating: {{review.clean_rate}}</strong> </td>
+                            <td>
+                                {% if review.user_id == session.user_id %}
+                                <a href="/edit/review/{{review.id}}">Edit</a>
+                                <a href="/destroy/review/{{review.id}}">Delete</a>
+                                {%endif%}
+                                <a href="/review/{{review.id}}">View</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {%endif%}
+                </tbody>
+            </table>
+        </div>
+        {%if session['user_id']%}
+        <button type="button" id="formButton">Critique This Commode</button> 
+        <!-- this button will be to open up the form -->
+        <div class = "form-control">
+            <form id="form1" action="/create/review" method="post">
+                <h2>Create Review</h2>
+                {% with messages = get_flashed_messages(category_filter=['commode']) %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <p>{{message}}</p>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                <div>
+                    <input type="hidden" name="created_by" value="{{user.user_name}}">
+                    <label for="location">Location:</label>
+                    <input type="text" name="location" value="{{commode.location}}">
+                </div>
+                <div>
+                    <label for="content">Your Review:</label>
+                    <textarea name="content" cols="30" rows="10"></textarea>
+                </div>
+                <div>
+                    <label for="comfy_rate">Comfort Level (between 1 and 5):</label>
+                    <input type="number" id="comfy_rate" name="comfy_rate" min="1" max="5" value="1">
+                </div>
+                <div>
+                    <label for="atmos_rate">Atmosphere (between 1 and 5):</label>
+                    <input type="number" id="atmos_rate" name="atmos_rate" min="1" max="5" value="1">
+                </div>
+                <div>
+                    <label for="safe_rate">Safety (between 1 and 5):</label>
+                    <input type="number" id="safe_rate" name="safe_rate" min="1" max="5" value="1">
+                </div>
+                <div>
+                    <label for="clean_rate">How Clean Was It? (between 1 and 9):</label>
+                    <input type="number" id="clean_rate" name="clean_rate" min="1" max="9" value="1">
+                </div>
+                <div>
+                    <input type="submit" value="Submit">
+                </div>
+            </form>
+        </div>
+        {%endif%}
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+        <script src="script.js"></script>
+</body>
+</html>
